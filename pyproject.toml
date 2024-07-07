@@ -6,7 +6,7 @@ authors = ["Maalik Kaufhold <mail@maalikaufhold.de>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "~3.12"
 aiohttp = "^3.9.5"
 wxpython = "^4.2.1"
 beautifulsoup4 = "^4.12.3"
@@ -17,6 +17,7 @@ appdirs = "^1.4.4"
 ruff = "^0.5.0"
 ruff-lsp = "^0.0.54"
 pre-commit = "^3.7.1"
+pyinstaller = "^6.9.0"
 
 
 [tool.poetry.group.scraper.dependencies]

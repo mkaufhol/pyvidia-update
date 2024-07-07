@@ -1,6 +1,10 @@
 import wx
 from wx.adv import TaskBarIcon
 
+from pyvidia_update.source.get_files import get_packaged_files_path
+
+get_packaged_files_path = get_packaged_files_path()
+
 
 class PyvidiaTaskBarIcon(TaskBarIcon):
     def __init__(self, frame: wx.Frame):
@@ -9,7 +13,10 @@ class PyvidiaTaskBarIcon(TaskBarIcon):
         self.frame: wx.Frame = frame
 
         self.SetIcon(
-            wx.Icon("./assets/pyvidia-logo.ico", wx.BITMAP_TYPE_ICO), "Pyvidia Updater"
+            wx.Icon(
+                f"{get_packaged_files_path}/assets/pyvidia-logo.ico", wx.BITMAP_TYPE_ICO
+            ),
+            "Pyvidia Updater",
         )
 
         self.Bind(wx.EVT_MENU, self.on_task_bar_activate, id=1)

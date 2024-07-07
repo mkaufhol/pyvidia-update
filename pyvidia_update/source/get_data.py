@@ -2,11 +2,16 @@ import logging
 import os
 import pickle
 
+from pyvidia_update.source.get_files import get_packaged_files_path
+
 logger = logging.getLogger(__name__)
 
 
+filepath = get_packaged_files_path()
+
+
 class DropdownData:
-    pickle_data_path: str = "./data/nvidia-dropdown-values.pkl"
+    pickle_data_path: str = f"{filepath}/data/nvidia-dropdown-values.pkl"
     data: dict = {}
     switch_kv: bool = False
 
@@ -17,7 +22,11 @@ class DropdownData:
     def _load_data(self):
         if not os.path.exists(self.pickle_data_path):
             logger.error(f"Path {self.pickle_data_path} does not exist")
-            raise FileNotFoundError
+            raise FileNotFoundError(
+                f"Path {self.pickle_data_path} does not exist."
+                f"\nCurrent Path: {os.curdir} \n"
+                f"|_ {'\n|_ '.join(os.listdir('.'))}"
+            )
         with open(self.pickle_data_path, "rb") as f:
             data: dict = pickle.load(f)
             logger.debug(f"Loading data from file {self.pickle_data_path}")

@@ -10,6 +10,9 @@ from pyvidia_update.ui.tray import PyvidiaTaskBarIcon
 from pyvidia_update.source.get_data import DropdownData
 from pyvidia_update.source.get_system_info import get_current_nvidia_driver_version
 from pyvidia_update.source.user_saved_data import SelectedDrivers
+from pyvidia_update.source.get_files import get_packaged_files_path
+
+get_packaged_files_path = get_packaged_files_path()
 
 
 class DropDownHierarchy(Enum):
@@ -52,7 +55,11 @@ class ConfigFrame(wx.Frame):
 
         self.SetPosition((x_pos, y_pos))
 
-        self.SetIcon(wx.Icon("./assets/pyvidia-logo.ico", wx.BITMAP_TYPE_ICO))
+        self.SetIcon(
+            wx.Icon(
+                f"{get_packaged_files_path}/assets/pyvidia-logo.ico", wx.BITMAP_TYPE_ICO
+            )
+        )
         self.tskic = PyvidiaTaskBarIcon(self)
         self.Bind(wx.EVT_CLOSE, self.on_close)
 
