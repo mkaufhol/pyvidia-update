@@ -9,6 +9,7 @@ from pyvidia_update.source.get_current_driver_version import get_current_driver_
 from pyvidia_update.ui.tray import PyvidiaTaskBarIcon
 from pyvidia_update.source.get_data import DropdownData
 from pyvidia_update.source.get_system_info import get_current_nvidia_driver_version
+from pyvidia_update.source.user_saved_data import SelectedDrivers
 
 
 class DropDownHierarchy(Enum):
@@ -22,6 +23,8 @@ class DropDownHierarchy(Enum):
 
 class ConfigFrame(wx.Frame):
     # Set the selected data keys here
+    selected_conf = SelectedDrivers()
+
     selected_product_type: str = None
     selected_product_series: str = None
     selected_product: str = None
@@ -55,6 +58,15 @@ class ConfigFrame(wx.Frame):
 
         panel = wx.Panel(self)
 
+        # Initialize saved user settings
+        self.selected_conf.load_from_pkl()
+        self.selected_product_type = self.selected_conf.product_type
+        self.selected_product_series = self.selected_conf.product_series
+        self.selected_product = self.selected_conf.product
+        self.selected_os = self.selected_conf.os
+        self.selected_dt = self.selected_conf.dt
+        self.selected_language = self.selected_conf.language
+
         # DROPDOWN FIELDS
         # ========================================================================================
         product_type_data = self.dd.get_product_type_data()
@@ -62,7 +74,12 @@ class ConfigFrame(wx.Frame):
         self.product_type_dropdown = wx.Choice(
             panel, choices=list(product_type_data.keys())
         )
-        selected_product_type_index = 0
+        selected_product_type_index = (
+            list(product_type_data.values()).index(self.selected_product_type)
+            if self.selected_product_type is not None
+            and self.selected_product_type in list(product_type_data.values())
+            else 0
+        )
         self.product_type_dropdown.SetSelection(selected_product_type_index)
         self.selected_product_type = product_type_data[
             list(product_type_data.keys())[selected_product_type_index]
@@ -80,7 +97,12 @@ class ConfigFrame(wx.Frame):
         self.product_series_dropdown = wx.Choice(
             panel, choices=list(product_series_data.keys())
         )
-        selected_product_series_index = 0
+        selected_product_series_index = (
+            list(product_series_data.values()).index(self.selected_product_series)
+            if self.selected_product_series is not None
+            and self.selected_product_series in list(product_series_data.values())
+            else 0
+        )
         self.product_series_dropdown.SetSelection(selected_product_series_index)
         self.selected_product_series = product_series_data[
             list(product_series_data.keys())[selected_product_series_index]
@@ -94,7 +116,12 @@ class ConfigFrame(wx.Frame):
         )
         self.product_dropdown_label = wx.StaticText(panel, label="Product")
         self.product_dropdown = wx.Choice(panel, choices=list(product_data.keys()))
-        selected_product_index = 0
+        selected_product_index = (
+            list(product_data.values()).index(self.selected_product)
+            if self.selected_product is not None
+            and self.selected_product in list(product_data.values())
+            else 0
+        )
         self.product_dropdown.SetSelection(selected_product_index)
         self.selected_product = product_data[
             list(product_data.keys())[selected_product_index]
@@ -110,7 +137,12 @@ class ConfigFrame(wx.Frame):
         )
         self.os_dropdown_label = wx.StaticText(panel, label="Operating System")
         self.os_dropdown = wx.Choice(panel, choices=list(os_data.keys()))
-        selected_os_index = 0
+        selected_os_index = (
+            list(os_data.values()).index(self.selected_os)
+            if self.selected_os is not None
+            and self.selected_os in list(os_data.values())
+            else 0
+        )
         self.os_dropdown.SetSelection(selected_os_index)
         self.selected_os = os_data[list(os_data.keys())[selected_os_index]]
         self.os_dropdown.Bind(wx.EVT_CHOICE, self.on_os_change)
@@ -125,7 +157,12 @@ class ConfigFrame(wx.Frame):
         )
         self.dt_dropdown_label = wx.StaticText(panel, label="Download Type")
         self.dt_dropdown = wx.Choice(panel, choices=list(dt_data.keys()))
-        selected_dt_index = 0
+        selected_dt_index = (
+            list(dt_data.values()).index(self.selected_dt)
+            if self.selected_dt is not None
+            and self.selected_dt in list(dt_data.values())
+            else 0
+        )
         self.dt_dropdown.SetSelection(selected_dt_index)
         self.selected_dt = dt_data[list(dt_data.keys())[selected_dt_index]]
         self.dt_dropdown.Bind(wx.EVT_CHOICE, self.on_dt_change)
@@ -141,7 +178,12 @@ class ConfigFrame(wx.Frame):
         )
         self.lan_dropdown_label = wx.StaticText(panel, label="Language")
         self.lan_dropdown = wx.Choice(panel, choices=list(lan_data.keys()))
-        selected_lan_index = 0
+        selected_lan_index = (
+            list(lan_data.values()).index(self.selected_language)
+            if self.selected_language is not None
+            and self.selected_language in list(lan_data.values())
+            else 0
+        )
         self.lan_dropdown.SetSelection(selected_lan_index)
         self.selected_language = lan_data[list(lan_data.keys())[selected_lan_index]]
         self.lan_dropdown.Bind(wx.EVT_CHOICE, self.on_lan_change)
@@ -327,7 +369,6 @@ class ConfigFrame(wx.Frame):
             list(product_series_data.keys())[selected_product_series_index]
         ]
         self._fill_product_dropdown()
-        self._fill_os_dropdown()
 
     def _fill_product_dropdown(self):
         self.product_dropdown.Clear()
@@ -386,6 +427,13 @@ class ConfigFrame(wx.Frame):
         selected_lan_index = 0
         self.lan_dropdown.SetSelection(selected_lan_index)
         self.selected_language = lan_data[list(lan_data.keys())[selected_lan_index]]
+        self.selected_conf.product_type = self.selected_product_type
+        self.selected_conf.product_series = self.selected_product_series
+        self.selected_conf.product = self.selected_product
+        self.selected_conf.os = self.selected_os
+        self.selected_conf.dt = self.selected_dt
+        self.selected_conf.language = self.selected_language
+        self.selected_conf.save_as_pkl()
         self._set_download_link()
 
     def _set_download_link(self):
@@ -424,7 +472,5 @@ class ConfigFrame(wx.Frame):
         msg_text = "Hello, World!"
         nmsg = wx.adv.NotificationMessage(title=msg_title, message=msg_text)
         nmsg.SetFlags(wx.ICON_INFORMATION)
-        # nmsg.AddAction(Act_Id_1, "Cancel")
-        # nmsg.AddAction(Act_Id_2, "Hold")
         nmsg.Show(timeout=5)
         self.Hide()
