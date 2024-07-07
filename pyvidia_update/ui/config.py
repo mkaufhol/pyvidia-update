@@ -43,7 +43,7 @@ class ConfigFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.SetSize((500, 500))
+        self.SetSize((500, 520))
         screen_width = wx.GetDisplaySize()[0]
         screen_height = wx.GetDisplaySize()[1]
 
@@ -207,6 +207,9 @@ class ConfigFrame(wx.Frame):
             panel,
             label=f"Last check: {dt.datetime.now().strftime('%d.%m.%Y %H:%M:%S')}",
         )
+        footer_link = wx.adv.HyperlinkCtrl(panel, -1)
+        footer_link.SetLabel("Find Source code on Github")
+        footer_link.SetURL("https://github.com/mkaufhol/pyvidia-update")
 
         # Panel Arrangement
         # ========================================================================================
@@ -248,6 +251,11 @@ class ConfigFrame(wx.Frame):
         h_sizer.Add(v3_sizer)
 
         main_sizer.Add(h_sizer, 0, wx.ALL | wx.EXPAND, 5)
+
+        h2_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        h2_sizer.Add(footer_link, 0, wx.ALL | wx.EXPAND, 5)
+
+        main_sizer.Add(h2_sizer)
 
         panel.SetSizer(main_sizer)
 

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pyvidia-update"
 version = "0.1.0"
-description = ""
+description = "A simple application that checks your Nvidia Graphics card driver with the current Version from the Nvidia Download page"
 authors = ["Maalik Kaufhold <mail@maalikaufhold.de>"]
 readme = "README.md"
 
