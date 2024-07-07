@@ -172,15 +172,3 @@ class DropdownData:
         return self.data[product_type_id][product_series_id][product_id][os_id][dt_id][
             language_id
         ].get("download_url", "not_found")
-
-
-if __name__ == "__main__":
-    data_dropdown = DropdownData()
-
-    print(data_dropdown.get_product_type_data())
-    print(data_dropdown.get_product_series_data("1"))
-    print(data_dropdown.get_product_data("1", "127"))
-    print(data_dropdown.get_os_data("1", "127", "1036"))
-    print(data_dropdown.get_dt_data("1", "127", "1036", "135"))
-    print(data_dropdown.get_language_data("1", "127", "1036", "135", "1"))
-    print(data_dropdown.get_download_link("1", "127", "1036", "135", "1", "1"))

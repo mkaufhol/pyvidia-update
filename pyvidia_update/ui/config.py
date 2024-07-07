@@ -3,8 +3,10 @@ from enum import Enum
 import wx
 import wx.adv
 
+from pyvidia_update.source.get_current_driver_version import get_current_driver_version
 from pyvidia_update.ui.tray import PyvidiaTaskBarIcon
 from pyvidia_update.source.get_data import DropdownData
+from pyvidia_update.source.get_system_info import get_current_nvidia_driver_version
 
 
 class DropDownHierarchy(Enum):
@@ -144,6 +146,12 @@ class ConfigFrame(wx.Frame):
 
         # ========================================================================================
 
+        self.system_version = wx.StaticText(
+            panel, label="System driver version not found!"
+        )
+        self.current_version = wx.StaticText(
+            panel, label="Current driver version not found!"
+        )
         self.link = wx.adv.HyperlinkCtrl(panel, -1)
         self._set_download_link()
 
@@ -168,6 +176,8 @@ class ConfigFrame(wx.Frame):
         sizer.Add(self.lan_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.lan_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
+        sizer.Add(self.system_version, 0, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.current_version, 0, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.link, 0, wx.ALL | wx.EXPAND, 5)
 
         panel.SetSizer(sizer)
@@ -350,12 +360,19 @@ class ConfigFrame(wx.Frame):
             self.selected_dt,
             self.selected_language,
         )
+        self.system_version.SetLabel(
+            f"Installed version: {get_current_nvidia_driver_version()}"
+        )
         if dl_link == "not_found":
             self.link.SetURL("https://www.nvidia.com/Download/index.aspx")
             self.link.SetLabel("No Download Link found, find on nvidia.com")
+            self.current_version.Show(False)
         else:
             self.link.SetURL(dl_link)
             self.link.SetLabel("Download Link")
+            current_version = get_current_driver_version(dl_link)
+            self.current_version.Show(True)
+            self.current_version.SetLabel(f"Current version: {current_version}")
 
     def on_close(self, event):
         msg_title = "Notification"

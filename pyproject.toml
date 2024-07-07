@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 aiohttp = "^3.9.5"
 wxpython = "^4.2.1"
+beautifulsoup4 = "^4.12.3"
 
 
 [tool.poetry.group.dev.dependencies]
