@@ -32,6 +32,7 @@ class PyvidiaTaskBarIcon(TaskBarIcon):
     def on_task_bar_activate(self, event):
         if not self.frame.IsShown():
             self.frame.Show()
+        self.frame.Raise()
 
     def on_task_bar_deactivate(self, event):
         if self.frame.IsShown():

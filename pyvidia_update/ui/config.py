@@ -152,6 +152,9 @@ class ConfigFrame(wx.Frame):
         self.current_version = wx.StaticText(
             panel, label="Current driver version not found!"
         )
+        self.current_version_date = wx.StaticText(
+            panel, label="Current driver version not found!"
+        )
         self.link = wx.adv.HyperlinkCtrl(panel, -1)
         self._set_download_link()
 
@@ -178,6 +181,7 @@ class ConfigFrame(wx.Frame):
 
         sizer.Add(self.system_version, 0, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.current_version, 0, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.current_version_date, 0, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.link, 0, wx.ALL | wx.EXPAND, 5)
 
         panel.SetSizer(sizer)
@@ -367,12 +371,17 @@ class ConfigFrame(wx.Frame):
             self.link.SetURL("https://www.nvidia.com/Download/index.aspx")
             self.link.SetLabel("No Download Link found, find on nvidia.com")
             self.current_version.Show(False)
+            self.current_version_date.Show(False)
         else:
             self.link.SetURL(dl_link)
             self.link.SetLabel("Download Link")
             current_version = get_current_driver_version(dl_link)
             self.current_version.Show(True)
-            self.current_version.SetLabel(f"Current version: {current_version}")
+            self.current_version.SetLabel(f"Current version: {current_version.version}")
+            self.current_version_date.Show(True)
+            self.current_version_date.SetLabel(
+                f"Release Date: {current_version.release_date}"
+            )
 
     def on_close(self, event):
         msg_title = "Notification"
