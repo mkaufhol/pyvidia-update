@@ -198,8 +198,8 @@ class ConfigFrame(wx.Frame):
 
         v3_sizer = wx.BoxSizer(wx.VERTICAL)
         v3_sizer.Add(self.link, 0, wx.ALL | wx.EXPAND, 5)
-        v3_sizer.Add(self.update_button, 0, wx.ALL | wx.EXPAND, 5)
         v3_sizer.Add(self.update_message_text, 0, wx.ALL | wx.EXPAND, 5)
+        v3_sizer.Add(self.update_button, 0, wx.ALL | wx.EXPAND, 5)
 
         h_sizer = wx.BoxSizer(wx.HORIZONTAL)
         h_sizer.Add(v2_sizer)
@@ -397,9 +397,8 @@ class ConfigFrame(wx.Frame):
             self.selected_dt,
             self.selected_language,
         )
-        self.system_version.SetLabel(
-            f"Installed version: {get_current_nvidia_driver_version()}"
-        )
+        current_system_version = get_current_nvidia_driver_version()
+        self.system_version.SetLabel(f"Installed version: {current_system_version}")
         if dl_link == "not_found":
             self.link.SetURL("https://www.nvidia.com/Download/index.aspx")
             self.link.SetLabel("No Download Link found, find on nvidia.com")
@@ -407,7 +406,7 @@ class ConfigFrame(wx.Frame):
             self.current_version_date.Show(False)
         else:
             self.link.SetURL(dl_link)
-            self.link.SetLabel("Download Link")
+
             current_version = get_current_driver_version(dl_link)
             self.current_version.Show(True)
             self.current_version.SetLabel(f"Current version: {current_version.version}")
@@ -415,6 +414,10 @@ class ConfigFrame(wx.Frame):
             self.current_version_date.SetLabel(
                 f"Release Date: {current_version.release_date}"
             )
+            if current_system_version == current_version.version:
+                self.link.SetLabel("Your drivers are up to Date!")
+            else:
+                self.link.SetLabel("Download URL")
 
     def on_close(self, event):
         msg_title = "Notification"
