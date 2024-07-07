@@ -1,3 +1,5 @@
+import datetime as dt
+import time
 from enum import Enum
 
 import wx
@@ -157,34 +159,55 @@ class ConfigFrame(wx.Frame):
         )
         self.link = wx.adv.HyperlinkCtrl(panel, -1)
         self._set_download_link()
+        self.update_button = wx.Button(panel, label="Check for updates")
+        self.update_button.Bind(wx.EVT_BUTTON, self.on_update_button_click)
+        self.update_message_text = wx.StaticText(
+            panel,
+            label=f"Last check: {dt.datetime.now().strftime('%d.%m.%Y %H:%M:%S')}",
+        )
 
         # Panel Arrangement
         # ========================================================================================
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.product_type_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.product_type_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        sizer.Add(self.product_series_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.product_series_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer = wx.BoxSizer(wx.VERTICAL)
+        dd_sizer.Add(self.product_type_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.product_type_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer.Add(self.product_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.product_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.product_series_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.product_series_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer.Add(self.os_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.os_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.product_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.product_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer.Add(self.dt_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.dt_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.os_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.os_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer.Add(self.lan_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.lan_dropdown, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.dt_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.dt_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer.Add(self.system_version, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.current_version, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.current_version_date, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(self.link, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.lan_dropdown_label, 0, wx.ALL | wx.EXPAND, 5)
+        dd_sizer.Add(self.lan_dropdown, 0, wx.ALL | wx.EXPAND, 5)
 
-        panel.SetSizer(sizer)
+        main_sizer.Add(dd_sizer, 0, wx.ALL | wx.EXPAND, 5)
+
+        v2_sizer = wx.BoxSizer(wx.VERTICAL)
+        v2_sizer.Add(self.system_version, 0, wx.ALL | wx.EXPAND, 5)
+        v2_sizer.Add(self.current_version, 0, wx.ALL | wx.EXPAND, 5)
+        v2_sizer.Add(self.current_version_date, 0, wx.ALL | wx.EXPAND, 5)
+
+        v3_sizer = wx.BoxSizer(wx.VERTICAL)
+        v3_sizer.Add(self.link, 0, wx.ALL | wx.EXPAND, 5)
+        v3_sizer.Add(self.update_button, 0, wx.ALL | wx.EXPAND, 5)
+        v3_sizer.Add(self.update_message_text, 0, wx.ALL | wx.EXPAND, 5)
+
+        h_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        h_sizer.Add(v2_sizer)
+        h_sizer.Add(v3_sizer)
+
+        main_sizer.Add(h_sizer, 0, wx.ALL | wx.EXPAND, 5)
+
+        panel.SetSizer(main_sizer)
 
     def on_product_type_change(self, event):
         selected_option = self.product_type_dropdown.GetStringSelection()
@@ -267,6 +290,16 @@ class ConfigFrame(wx.Frame):
                 f"Selected option {selected_option} is not in Language data list"
             )
         self.selected_language = data[selected_option]
+
+    def on_update_button_click(self, event):
+        self._set_download_link()
+        self.update_message_text.SetForegroundColour(wx.Colour(0, 128, 0))
+        self.update_message_text.SetLabel("Update check completed!")
+        time.sleep(2)
+        self.update_message_text.SetLabel(
+            f"Last check: {dt.datetime.now().strftime('%d.%m.%Y %H:%M:%S')}"
+        )
+        self.update_message_text.SetForegroundColour(wx.Colour(0, 0, 0))
 
     def _fill_dropdowns(self, level: DropDownHierarchy):
         match level:
