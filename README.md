@@ -62,5 +62,5 @@ poetry run python -m scraper.nvidia_driver_dropdowns
 ### Build a new .exe
 
 ```bash
-pyinstaller --add-data "data/nvidia-dropdown-values.pkl:data" --add-data "assets/pyvidia-logo.ico:assets" --noconsole --icon ./assets/pyvidia-logo.ico --onefile pyvidia_update/ui/app.py
+pyinstaller --add-data "data/nvidia-dropdown-values.pkl:data" --add-data "assets/pyvidia-logo.ico:assets" --noconsole --icon ./assets/pyvidia-logo.ico --onefile --name "pyvidia-update" pyvidia_update/ui/app.py
 ```

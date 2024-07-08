@@ -2,6 +2,7 @@ import wx
 from wx.adv import TaskBarIcon
 
 from pyvidia_update.source.get_files import get_packaged_files_path
+from pyvidia_update.ui.notifications import notify_running_in_background
 
 get_packaged_files_path = get_packaged_files_path()
 
@@ -44,3 +45,4 @@ class PyvidiaTaskBarIcon(TaskBarIcon):
     def on_task_bar_deactivate(self, event):
         if self.frame.IsShown():
             self.frame.Hide()
+            notify_running_in_background()

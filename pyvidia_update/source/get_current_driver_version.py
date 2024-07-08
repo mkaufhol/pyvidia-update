@@ -20,7 +20,9 @@ driver_info = CurrentDriverInfo(
 )
 
 
-def get_current_driver_version(url: str) -> CurrentDriverInfo:
+def get_current_driver_version(url: str | None) -> CurrentDriverInfo:
+    if url is None:
+        return driver_info
     try:
         response = requests.get(url)
         soup = Bs(response.text, features="html.parser")

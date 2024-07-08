@@ -20,6 +20,7 @@ class SelectedDrivers:
     os: str | None
     dt: str | None
     language: str | None
+    dl_link: str | None
 
     _pickle_file: str = Path(user_dir).joinpath("saved_selected_config.pkl")
 
@@ -34,6 +35,7 @@ class SelectedDrivers:
             "os": self.os,
             "dt": self.dt,
             "language": self.language,
+            "dl_link": self.dl_link,
         }
 
     def _load_from_dict(self, data: dict):
@@ -43,6 +45,7 @@ class SelectedDrivers:
         self.os = data.get("os", None)
         self.dt = data.get("dt", None)
         self.language = data.get("language", None)
+        self.dl_link = data.get("dl_link", None)
 
     @staticmethod
     def _check_if_dir_exists():

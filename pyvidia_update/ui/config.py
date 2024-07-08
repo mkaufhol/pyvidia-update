@@ -6,6 +6,10 @@ import wx
 import wx.adv
 
 from pyvidia_update.source.get_current_driver_version import get_current_driver_version
+from pyvidia_update.ui.notifications import (
+    notify_running_in_background,
+    notify_new_update,
+)
 from pyvidia_update.ui.tray import PyvidiaTaskBarIcon
 from pyvidia_update.source.get_data import DropdownData
 from pyvidia_update.source.get_system_info import get_current_nvidia_driver_version
@@ -34,6 +38,8 @@ class ConfigFrame(wx.Frame):
     selected_os: str = None
     selected_dt: str = None
     selected_language: str = None
+
+    dl_link = ""
 
     dd = DropdownData(switch_kv=True)
     _dropdown_mapping = {
@@ -73,6 +79,14 @@ class ConfigFrame(wx.Frame):
         self.selected_os = self.selected_conf.os
         self.selected_dt = self.selected_conf.dt
         self.selected_language = self.selected_conf.language
+        self.dl_link = self.dd.get_download_link(
+            self.selected_product_type,
+            self.selected_product_series,
+            self.selected_product,
+            self.selected_os,
+            self.selected_dt,
+            self.selected_language,
+        )
 
         # DROPDOWN FIELDS
         # ========================================================================================
@@ -207,7 +221,7 @@ class ConfigFrame(wx.Frame):
             panel, label="Current driver version not found!"
         )
         self.link = wx.adv.HyperlinkCtrl(panel, -1)
-        self._set_download_link()
+        self.set_download_link()
         self.update_button = wx.Button(panel, label="Check for updates")
         self.update_button.Bind(wx.EVT_BUTTON, self.on_update_button_click)
         self.update_message_text = wx.StaticText(
@@ -349,7 +363,7 @@ class ConfigFrame(wx.Frame):
         self.selected_language = data[selected_option]
 
     def on_update_button_click(self, event):
-        self._set_download_link()
+        self.set_download_link()
         self.update_message_text.SetForegroundColour(wx.Colour(0, 128, 0))
         self.update_message_text.SetLabel("Update check completed!")
         time.sleep(2)
@@ -442,17 +456,11 @@ class ConfigFrame(wx.Frame):
         selected_lan_index = 0
         self.lan_dropdown.SetSelection(selected_lan_index)
         self.selected_language = lan_data[list(lan_data.keys())[selected_lan_index]]
-        self.selected_conf.product_type = self.selected_product_type
-        self.selected_conf.product_series = self.selected_product_series
-        self.selected_conf.product = self.selected_product
-        self.selected_conf.os = self.selected_os
-        self.selected_conf.dt = self.selected_dt
-        self.selected_conf.language = self.selected_language
-        self.selected_conf.save_as_pkl()
-        self._set_download_link()
+        self.set_download_link()
 
-    def _set_download_link(self):
-        dl_link = self.dd.get_download_link(
+    def set_download_link(self):
+        self.save_user_conf()
+        self.dl_link = self.dd.get_download_link(
             self.selected_product_type,
             self.selected_product_series,
             self.selected_product,
@@ -462,15 +470,15 @@ class ConfigFrame(wx.Frame):
         )
         current_system_version = get_current_nvidia_driver_version()
         self.system_version.SetLabel(f"Installed version: {current_system_version}")
-        if dl_link == "not_found":
+        if self.dl_link == "not_found":
             self.link.SetURL("https://www.nvidia.com/Download/index.aspx")
             self.link.SetLabel("No Download Link found, find on nvidia.com")
             self.current_version.Show(False)
             self.current_version_date.Show(False)
         else:
-            self.link.SetURL(dl_link)
+            self.link.SetURL(self.dl_link)
 
-            current_version = get_current_driver_version(dl_link)
+            current_version = get_current_driver_version(self.dl_link)
             self.current_version.Show(True)
             self.current_version.SetLabel(f"Current version: {current_version.version}")
             self.current_version_date.Show(True)
@@ -480,12 +488,23 @@ class ConfigFrame(wx.Frame):
             if current_system_version == current_version.version:
                 self.link.SetLabel("Your drivers are up to Date!")
             else:
-                self.link.SetLabel("Download URL")
+                self.link.SetLabel("New drivers available: Download URL")
+                notify_new_update(
+                    current_system_version,
+                    current_version.version,
+                    current_version.release_date,
+                )
+
+    def save_user_conf(self):
+        self.selected_conf.product_type = self.selected_product_type
+        self.selected_conf.product_series = self.selected_product_series
+        self.selected_conf.product = self.selected_product
+        self.selected_conf.os = self.selected_os
+        self.selected_conf.dt = self.selected_dt
+        self.selected_conf.language = self.selected_language
+        self.selected_conf.dl_link = self.dl_link
+        self.selected_conf.save_as_pkl()
 
     def on_close(self, event):
-        msg_title = "Notification"
-        msg_text = "Hello, World!"
-        nmsg = wx.adv.NotificationMessage(title=msg_title, message=msg_text)
-        nmsg.SetFlags(wx.ICON_INFORMATION)
-        nmsg.Show(timeout=5)
+        notify_running_in_background()
         self.Hide()
